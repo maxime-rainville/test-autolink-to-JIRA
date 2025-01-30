@@ -28,7 +28,7 @@ jobs:
               // Check if Related section already exists
               if (!currentBody.includes('## Related')) {
                 // Add Related section with JIRA link
-                const newBody = currentBody + "\n\n## Related\n- [${jiraId}](${jiraLink})";
+                const newBody = currentBody + "\n\n## Related\n- [JIRA Issue](" + jiraLink + ")";
                 // Update PR description
                 await github.rest.pulls.update({
                   owner: context.repo.owner,
