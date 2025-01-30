@@ -1,0 +1,44 @@
+name: Add JIRA Link to PR
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  add-jira-link:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Update PR Description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Extract JIRA issue ID from branch name
+            const branchName = context.payload.pull_request.head.ref;
+            const jiraMatch = branchName.match(/[A-Z]+-\d+/);
+            
+            if (jiraMatch) {
+              const jiraId = jiraMatch[0];
+              const jiraLink = `https://archipro.atlassian.net/browse/${jiraId}`;
+              
+              // Get current PR description
+              const currentBody = context.payload.pull_request.body || '';
+              
+              // Check if Related section already exists
+              if (!currentBody.includes('## Related')) {
+                // Add Related section with JIRA link
+                const newBody = `${currentBody}
+
+## Related
+- [${jiraId}](${jiraLink})`;
+                
+                // Update PR description
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  body: newBody
+                });
+              }
+            }
