@@ -10,7 +10,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Update PR Description
+      - name: Add JIRA Link Comment
         uses: actions/github-script@v7
         with:
           script: |
@@ -22,19 +22,11 @@ jobs:
               const jiraId = jiraMatch[0];
               const jiraLink = `https://archipro.atlassian.net/browse/${jiraId}`;
               
-              // Get current PR description
-              const currentBody = context.payload.pull_request.body || '';
-              
-              // Check if Related section already exists
-              if (!currentBody.includes('## Related')) {
-                // Add Related section with JIRA link
-                const newBody = currentBody + "\n\n## Related\n- [JIRA Issue](" + jiraLink + ")";
-                // Update PR description
-                await github.rest.pulls.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: context.issue.number,
-                  body: newBody
-                });
-              }
+              // Create comment with JIRA link
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `📎 Related JIRA Issue: [${jiraId}](${jiraLink})`
+              });
             }
