@@ -17,6 +17,9 @@ jobs:
             // Extract JIRA issue ID from branch name
             const branchName = context.payload.pull_request.head.ref;
             const jiraMatch = branchName.match(/[A-Z]+-\d+/);
+
+            console.log(branchName);
+            console.log(jiraMatch);
             
             if (jiraMatch) {
               const jiraId = jiraMatch[0];
@@ -37,4 +40,6 @@ jobs:
                   body: newBody
                 });
               }
+            } else {
+              console.log("No JIRA issue ID found in branch name");
             }
